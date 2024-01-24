@@ -1,0 +1,437 @@
+<?php
+include 'condb.php';
+$ids=$_GET['id'];  
+$sql="SELECT * FROM borrow_db b , register_db r ,status_tbl s  WHERE b.status_id=s.status_id and b.status_id='7' and b.m_id=r.m_id 
+order by b.status_id  "; 
+$result= mysqli_query($conn,$sql);
+$rs=mysqli_fetch_array($result);      
+
+session_start();  
+
+if (!$_SESSION['username']) {  
+   header("Location: index.php");  
+} else {  
+
+?> 
+ 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Medical Equipment Borrowing-Return System</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+        <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sidebars/"> 
+ 
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">   
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>   
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css" integrity="sha512-mR/b5Y7FRsKqrYZou7uysnOdCIJib/7r5QeJMFvLNHNhtye3xJp1TdJVPLtetkukFn227nKpXD9OjUc09lx97Q==" crossorigin="anonymous"referrerpolicy="no-referrer" /> 
+  
+
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3"> 
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+    <script> 
+  $(document).ready(function(){  // 
+  $("#product_devicename").change(function(){  // 
+     
+  $.ajax({ 
+  url: "select_product2.php", //ทำงานกับไฟล์นี้ 
+  data: "devicename_id=" + $("#product_devicename").val(),  //ส่งตัวแปร 
+  type: "POST", 
+  async:false, 
+  success: function(data, status) { 
+    $("#product").html(data); 
+     
+   }, 
+    
+  error: function(xhr, status, exception) { alert(status); } 
+    
+  }); 
+   //return flag; 
+  }); 
+  }); 
+ 
+  </script> 
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="admin_page.php">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Borrowing Return</div>
+            </a>
+
+            <?php 
+               $sql1="SELECT orderID , COUNT(orderID) AS count_orderID FROM borrow_db WHERE status_id=6 "; 
+               $result1 = mysqli_query($conn,$sql1); 
+               while($row=mysqli_fetch_array($result1)){ 
+              //echo $sql1;  
+              //exit(); 
+            ?> 
+
+            <?php 
+               $sql5="SELECT orderID , COUNT(orderID) AS count_orderID_add FROM add_day_borrow WHERE status_id=13 "; 
+               $result5 = mysqli_query($conn,$sql5); 
+               while($row5=mysqli_fetch_array($result5)){ 
+              //echo $sql1;  
+              //exit(); 
+            ?> 
+
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="admin_page.php">
+                    <i class="fas fa-home"></i>
+                    <span>หน้าแรก</span></a>
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="product_db.php">
+                    <i class="fas fa-briefcase-medical"></i>
+                    <span>คลังเครื่องสำรองทั้งหมด</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="request_borrow_db.php">
+                    <i class="fas fa-cart-arrow-down"></i>
+                    <span class="badge badge-danger badge-counter"><?=$row["count_orderID"]; ?></span>
+                    <span>คำร้องขอการจองเครื่อง</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="request_add_day_borrow_db.php">
+                    <i class="fas fa-cart-arrow-down"></i>
+                    <span class="badge badge-danger badge-counter"><?=$row5["count_orderID_add"]; ?></span>
+                    <span>คำร้องขอการยืมเครื่องต่อ</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="record_borrow_db.php">
+                    <i class="fas fa-save"></i>
+                    <span>บันทึกการยืม</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="record_return_db.php">
+                    <i class="fas fa-save"></i>
+                    <span>บันทึกการคืน</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="receiver.php">
+                    <i class="fas fa-address-card"></i>
+                    <span>ข้อมูลผู้มารับ-ส่งเครื่อง</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="reserve_admin_db.php">
+                    <i class="fas fa-folder"></i>
+                    <span>ประวัติการจอง</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="history.php">
+                    <i class="fas fa-file-alt"></i>
+                    <span>ประวัติการยืม-คืน</span></a>
+            </li>
+
+            <?php } } ?>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                       
+                    </form>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                                aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                            placeholder="Search for..." aria-label="Search"
+                                            aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+                        
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"> admin<?php echo $_SESSION['user']; ?></span>
+                                <img class="img-profile rounded-circle"
+                                    src="img/undraw_profile.svg">
+                            </a>
+                           <!-- Dropdown - User Information -->
+                           <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="logout.php" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+             <!-- Page Heading --> 
+             <div class="d-sm-flex align-items-center justify-content-between mb-4"> 
+                        <h1 class="h3 mb-0 text-gray-800">บันทึกการยืม</h1> 
+                    </div> 
+      
+                    <!-- Content Row --> 
+                    <div class="row"> 
+ 
+            <div class="col-sm-4"></div></div> 
+
+                                 
+                                 <div class ="card-body"> 
+                                      <h5>เลขที่ใบจอง <?=$ids?></h5> 
+                                       รหัสผู้ใช้งาน : <?=$rs['m_id']?><br> 
+                                       ชื่อผู้ขอจอง : <?=$rs['borrower']?><br> 
+                                       หน่วยงาน : <?=$rs['agencyname']?><br> 
+                                       สถานที่ตั้ง : <?=$rs['location']?><br> 
+                                       หมายเลขโทรศัพท์ : <?=$rs['telephone']?><br> 
+                            
+                    <table class="table table-striped mb-4 mt-4"> 
+                         <tr> 
+                         <th>ชื่ออุปกรณ์</th> 
+                         <th>ยี่ห้อ</th> 
+                         <th>รุ่น</th> 
+                         <th>จำนวน</th> 
+                         <th>วันที่จอง</th> 
+                         <th>วันที่เริ่มต้นยืม</th> 
+                         <th>กำหนดคืน</th> 
+                         <th>จำนวนที่อนุมัติ</th>
+                         </tr> 
+ 
+            <?php 
+            $sql="SELECT * FROM  order_borrow o , product_borrow p , borrow_db b , product_devicename d , product_brand  n , product_model m WHERE o.orderID=b.orderID  
+            and o.pro_id=p.pro_id and o.orderID='$ids' and p.devicename_id = d.devicename_id and p.brand_id = n.brand_id and p.model_id=m.model_id and b.status_id='7' and o.status_id='7' 
+            order by o.pro_id  "; 
+            $result=mysqli_query($conn,$sql); 
+            ?> 
+ 
+         <tbody> 
+            <?php foreach ($result as $row) { ?> 
+                <tr> 
+                 <td> 
+                    <?php echo $row["devicename"]; ?> 
+                 </td> 
+                 <td> 
+                    <?php echo $row["brand_name"]; ?> 
+                 </td> 
+                 <td> 
+                    <?php echo $row["model_name"]; ?> 
+                 </td> 
+                 <td> 
+                    <?php echo $row["orderQty"]; ?> 
+                 </td> 
+                 <td> 
+                    <?php echo $row["re_date"]; ?> 
+               </td> 
+               <td> 
+                    <?php echo $row["date_start"]; ?> 
+               </td> 
+               <td> 
+                    <?php echo $row["date_return"]; ?> 
+               </td> 
+               <td> 
+                    <?php echo $row["orderQty_up"]; ?> 
+               </td>
+              <?php  } ?> 
+             
+        </table>
+            
+                
+                <div class="row"> 
+
+                    <div class="col-md-10"> 
+                       <div class="h1 text-center alert alert-info mb-4 mt-4" role="alert">กรุณากรอกข้อมูลสำหรับการให้ยืมเครื่องมือแพทย์</div>
+                        
+                       <form  method="POST" action="insert_record_borrow.php">
+
+                       <label>เลขที่ใบจอง</label>
+                       <input type="text" name="orderID" class="form-control" value="<?=$row['orderID']?>" readonly > <br>
+                       
+                       <label>เลือกรหัสเครื่องที่ต้องการให้ยืม</label> 
+                        <select name="machinecode[]" class="form-control multiple-select" multiple >
+                         <?php   
+                                  $sql = "SELECT * FROM product WHERE status_id= '1' ";   
+                                  $result1 = mysqli_query($conn,$sql);  
+                                  if(mysqli_num_rows($result1) > 0 ) 
+                                      {
+                                        foreach($result1 as $row)
+                                           {
+                                               ?>
+                                              <option value="<?php echo $row['machinecode']; ?>"><?php echo $row['machinecode']; ?></option>
+                                               <?php
+                                           }
+                                       } 
+                                    else
+                                     {
+                                        echo "NO Record Found";
+                                    }
+                                         ?>   
+                        </select><br><br>
+                      
+                        <label>ผู้ให้ยืม</label>
+                        <input type="text" name="lender" class="form-control" value="<?php echo $_SESSION['user']; ?>" readonly ><br>
+                       
+                       <?php 
+                        $sql = "SELECT * FROM receiver ORDER BY name_id  asc" or die("Error:" . mysqli_error()); 
+                        $query = mysqli_query($conn, $sql); 
+                        ?> 
+
+                        <label>รหัสและชื่อผู้มารับเครื่อง</label> 
+
+                        <select name="name_id" id="receiver" class="form-control">  
+                        <option value="" selected disabled>กรุณาเลือกรหัสและชื่อผู้มารับเครื่อง</option>  
+                        <?php foreach ($query as $value){ ?>  
+                        <option value="<?=$value['name_id']?>"> <?=$value['name_id']?> <?=$value['fullname']?></option>  
+                        <?php } ?>  
+                        </select><br>  
+
+ 
+                    </div> 
+                  </div><br> 
+ 
+                            <div style="text-align:left"> 
+                               <button type="submit" name="save" class="btn btn-outline-secondary mb-4">ยืนยันการให้ยืม</button> 
+                               <a href ="record_borrow_db.php"><button type="button" class="btn btn-outline-secondary mb-4">ยกเลิก</button></a> 
+                            </div> 
+                        </form>
+                </div> 
+             </div>  
+         </div>  
+ 
+
+            <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">คุณต้องการออกจากระบบหรือไม่?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">ยกเลิก</button>
+                    <a class="btn btn-primary" href="index.php">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="vendor/chart.js/Chart.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="js/demo/chart-area-demo.js"></script>
+    <script src="js/demo/chart-pie-demo.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script> 
+ 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js" integrity="sha512-FHZVRMUW9FsXobt+ONiix6Z0tIkxvQfxtCSirkKc5Sb4TKHmqq1dZa8DphF0XqKb3ldLu/wgMa8mT6uXiLlRlw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(".multiple-select").select2({
+  maximumSelectionLength: 2
+});
+</script>
+</body>
+
+</html>
+<?php  } ?>
+
